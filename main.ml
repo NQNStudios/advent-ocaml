@@ -5,6 +5,9 @@ let read_whole_file filename =
     close_in ch;
     s
 
+let split_lines text =
+  split_on_char '\n' text
+
 let solve year day solver exampleResult =
   let prefix = string_of_int year ^ "/" ^ string_of_int day in
   let suffix = ".txt" in
@@ -15,5 +18,9 @@ let solve year day solver exampleResult =
     assert (eResult = exampleResult);
     Printf.printf "%d" realResult;;
 
-let day1 input = 0 in
-solve 2024 1 day1 142;
+let day1 input =
+  let lines = split_lines input in
+  let line_value line 
+
+
+solve 2024 1 day1 142;;
