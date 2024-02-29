@@ -6,7 +6,7 @@ let read_whole_file filename =
     s
 
 let split_lines text =
-  split_on_char '\n' text
+  String.split_on_char '\n' text
 
 let solve year day solver exampleResult =
   let prefix = string_of_int year ^ "/" ^ string_of_int day in
