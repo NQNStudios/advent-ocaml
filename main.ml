@@ -8,6 +8,8 @@ let read_whole_file filename =
 let split_lines text =
   String.split_on_char '\n' text
 
+let sum = List.fold_left ( + ) 0
+
 let solve year day part2 solver exampleResult =
   let prefix = string_of_int year ^ "/" ^ string_of_int day in
   let suffix = ".txt" in
@@ -49,7 +51,19 @@ let day1 part2 input =
     String.iteri proc_ch line;
     (* Printf.printf "%s -> %d \n" line (!first_num * 10 + !last_num); *)
     if !first_num <> -1 then (!first_num * 10 + !last_num) else 0 in
-  List.fold_left ( + ) 0 (List.map line_value lines);;
+  sum (List.map line_value lines);;
 
 solve 2023 1 false day1 142;;
 solve 2023 1 true day1 281;;
+
+let day2 part2 input =
+  let lines = split_lines input in
+  let process_line line =
+    let id_idx = 5 in
+    let id_end_idx = String.index line ':' in
+    let id = int_of_string (String.sub line id_idx (id_end_idx - id_idx)) in
+      id
+  in
+  (sum (List.map process_line lines));;
+
+solve 2023 2 false day2 8;;
