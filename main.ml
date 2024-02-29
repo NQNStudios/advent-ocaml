@@ -9,6 +9,7 @@ let split_lines text =
   String.split_on_char '\n' text
 
 let sum = List.fold_left ( + ) 0
+let product = List.fold_left ( * ) 1
 
 let solve year day part2 solver exampleResult =
   let prefix = string_of_int year ^ "/" ^ string_of_int day in
@@ -63,6 +64,7 @@ let day2 part2 input =
     let id_end_idx = String.index line ':' in
     let id = int_of_string (String.sub line id_idx (id_end_idx - id_idx)) in
     let block_limit = [("red", 12); ("green", 13); ("blue", 14)] in
+    let block_min = ref [("red", 0); ("green", 0); ("blue", 0)] in
     let sets = String.split_on_char ';' (String.sub line (2 + id_end_idx) ((String.length line) - id_end_idx - 2)) in
     let over_limit = ref false in
     (* for each set, check for an impossible amount of blocks *)
@@ -70,13 +72,15 @@ let day2 part2 input =
         let block_amounts = List.map String.trim (String.split_on_char ',' set) in
         let amounts = List.map (fun amt ->
                                     let parts = String.split_on_char ' ' amt in
-                                      (List.nth parts 0, List.nth parts 1)) block_amounts in
+                                      (int_of_string (List.nth parts 0), List.nth parts 1)) block_amounts in
           List.iter (fun amt -> match amt with
-                        | num, color -> if (int_of_string num) > (List.assoc color block_limit) then over_limit := true
-                        ) amounts
+                        | num, color ->
+                            if num > (List.assoc color block_limit) then over_limit := true;
+                            if num > (List.assoc color !block_min) then block_min := (color, num) :: (List.remove_assoc color !block_min)) amounts
         ) sets;
-    if !over_limit then 0 else id
+    if part2 then (product (List.map (fun p -> match p with _, amount -> amount) !block_min)) else if !over_limit then 0 else id
   in
   (sum (List.map process_line lines));;
 
 solve 2023 2 false day2 8;;
+solve 2023 2 true day2 2286;;
