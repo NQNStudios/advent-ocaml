@@ -62,7 +62,20 @@ let day2 part2 input =
     let id_idx = 5 in
     let id_end_idx = String.index line ':' in
     let id = int_of_string (String.sub line id_idx (id_end_idx - id_idx)) in
-      id
+    let block_limit = [("red", 12); ("green", 13); ("blue", 14)] in
+    let sets = String.split_on_char ';' (String.sub line (2 + id_end_idx) ((String.length line) - id_end_idx - 2)) in
+    let over_limit = ref false in
+    (* for each set, check for an impossible amount of blocks *)
+    List.iter (fun set ->
+        let block_amounts = List.map String.trim (String.split_on_char ',' set) in
+        let amounts = List.map (fun amt ->
+                                    let parts = String.split_on_char ' ' amt in
+                                      (List.nth parts 0, List.nth parts 1)) block_amounts in
+          List.iter (fun amt -> match amt with
+                        | num, color -> if (int_of_string num) > (List.assoc color block_limit) then over_limit := true
+                        ) amounts
+        ) sets;
+    if !over_limit then 0 else id
   in
   (sum (List.map process_line lines));;
 
