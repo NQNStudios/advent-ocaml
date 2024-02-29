@@ -22,5 +22,4 @@ let day1 input =
   let lines = split_lines input in
   let line_value line 
 
-
-solve 2024 1 day1 142;;
+solve 2023 1 day1 142;;
