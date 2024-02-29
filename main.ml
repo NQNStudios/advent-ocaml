@@ -16,7 +16,7 @@ let solve year day solver exampleResult =
   let eResult = solver (read_whole_file exampleFile) in
   let realResult = solver (read_whole_file inputFile) in
     assert (eResult = exampleResult);
-    Printf.printf "%d" realResult;;
+    Printf.printf "12/%d/%d: %d \n" day year realResult;;
 
 let day1 input =
   let lines = split_lines input in
