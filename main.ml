@@ -20,6 +20,17 @@ let solve year day solver exampleResult =
 
 let day1 input =
   let lines = split_lines input in
-  let line_value line 
+  let line_value line =
+    let first_num = ref (-1) in
+    let last_num = ref (-1) in
+    let proc_ch ch = match ch with
+                              | '0'..'9' -> let num = int_of_string (String.make 1 ch) in
+                                  last_num := num;
+                                  if !first_num = -1 then first_num := num
+                              | _ -> () in
+    String.iter proc_ch line;
+    (* Printf.printf "%s -> %d \n" line (!first_num * 10 + !last_num); *)
+    if !first_num <> -1 then (!first_num * 10 + !last_num) else 0 in
+  List.fold_left ( + ) 0 (List.map line_value lines);;
 
 solve 2023 1 day1 142;;
