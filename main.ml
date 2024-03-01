@@ -6,7 +6,7 @@ let read_whole_file filename =
     s
 
 let split_lines text =
-  String.split_on_char '\n' text
+  List.filter (fun l -> l <> String.empty) (String.split_on_char '\n' text)
 
 let sum = List.fold_left ( + ) 0
 let product = List.fold_left ( * ) 1
