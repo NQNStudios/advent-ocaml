@@ -18,6 +18,7 @@ let solve year day part2 solver exampleResult =
   let inputFile = prefix ^ suffix in
   let eResult = solver part2 (read_whole_file exampleFile) in
   let realResult = solver part2 (read_whole_file inputFile) in
+    Printf.printf "12/%d/%d%s example: %d \n" day year (if part2 then " part 2" else "") eResult;
     assert (eResult = exampleResult);
     Printf.printf "12/%d/%d%s: %d \n" day year (if part2 then " part 2" else "") realResult;;
 
