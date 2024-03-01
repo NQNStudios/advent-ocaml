@@ -84,3 +84,54 @@ let day2 part2 input =
 
 solve 2023 2 false day2 8;;
 solve 2023 2 true day2 2286;;
+
+let list2d input =
+  let lines = split_lines input in
+  List.map (fun line ->
+    let chars = ref [] in
+    String.iter
+      (fun ch ->
+        chars := !chars @ [ch])
+      line;
+    !chars)
+    lines;;
+
+let iter_grid f grid =
+  List.iteri (fun y -> fun line -> List.iteri (fun x -> fun ch -> f x y ch) line) grid
+
+let iter_adjacent f grid x y =
+  for x1 = x - 1 to x + 1 do
+    for y1 = y - 1 to y + 1 do
+      if not (x1 = x && y1 = y) then
+        f x1 y1 (List.nth (List.nth grid y1) x1)
+    done
+  done;;
+
+let day3 part2 input =
+  let nums = ref [] in
+  let current_num = ref "" in
+  let current_num_x = ref (-1) in
+  let current_num_y = ref (-1) in
+  let grid = list2d input in
+  iter_grid (fun x -> fun y -> fun ch ->
+    match ch with
+    | '0'..'9' ->
+      if !current_num <> String.empty then
+        current_num := !current_num ^ String.make 1 ch
+      else
+        begin
+          current_num := String.make 1 ch;
+          current_num_x := x;
+          current_num_y := y;
+        end
+    | _ ->
+      if !current_num <> String.empty then
+        nums := !nums @ [(!current_num, !current_num_x, !current_num_y)];
+        current_num := ""
+    ) grid;
+  match (List.nth !nums 0) with
+    | (num, x, y) -> print_string num; print_newline(); print_int x; print_newline(); print_int y; print_newline();
+  0;;
+
+
+solve 2023 3 false day3 4361;;
