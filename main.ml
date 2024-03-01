@@ -102,7 +102,7 @@ let iter_grid f grid =
 let iter_adjacent f grid x y =
   for x1 = x - 1 to x + 1 do
     for y1 = y - 1 to y + 1 do
-      if not (x1 = x && y1 = y) then
+      if not (x1 < 0 || y1 < 0 || x1 >= List.length (List.nth grid 0) || y1 >= List.length grid || x1 = x && y1 = y) then
         f x1 y1 (List.nth (List.nth grid y1) x1)
     done
   done;;
@@ -113,6 +113,7 @@ let day3 part2 input =
   let current_num_x = ref (-1) in
   let current_num_y = ref (-1) in
   let grid = list2d input in
+  let total = ref 0 in
   iter_grid (fun x -> fun y -> fun ch ->
     match ch with
     | '0'..'9' ->
@@ -129,9 +130,19 @@ let day3 part2 input =
         nums := !nums @ [(!current_num, !current_num_x, !current_num_y)];
         current_num := ""
     ) grid;
-  match (List.nth !nums 0) with
-    | (num, x, y) -> print_string num; print_newline(); print_int x; print_newline(); print_int y; print_newline();
-  0;;
+  List.iter (fun num_tuple ->
+    match num_tuple with
+      | (num, x, y) ->
+        let has_adjacent_symbol = ref false in
+          for x1 = x to x + (String.length num - 1) do
+            iter_adjacent (fun x -> fun y -> fun ch ->
+              match ch with
+              | '0'..'9'|'.' -> ()
+              | _ -> has_adjacent_symbol := true) grid x1 y
+          done;
+          if !has_adjacent_symbol then total := !total + int_of_string num
+    ) !nums;
+  !total;;
 
 
 solve 2023 3 false day3 4361;;
