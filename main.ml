@@ -9,7 +9,9 @@ let split_lines text =
   List.filter (fun l -> l <> String.empty) (String.split_on_char '\n' text)
 
 let sum = List.fold_left ( + ) 0
+let sumf = List.fold_left ( +. ) 0.
 let product = List.fold_left ( * ) 1
+let productf = List.fold_left ( *. ) 1.
 
 let solve year day part2 solver exampleResult =
   let prefix = string_of_int year ^ "/" ^ string_of_int day in
@@ -18,20 +20,20 @@ let solve year day part2 solver exampleResult =
   let inputFile = prefix ^ suffix in
   let eResult = solver part2 (read_whole_file exampleFile) in
   let realResult = solver part2 (read_whole_file inputFile) in
-    Printf.printf "12/%d/%d%s example: %d \n" day year (if part2 then " part 2" else "") eResult;
+    Printf.printf "12/%d/%d%s example: %f \n" day year (if part2 then " part 2" else "") eResult;
     assert (eResult = exampleResult);
-    Printf.printf "12/%d/%d%s: %d \n" day year (if part2 then " part 2" else "") realResult;;
+    Printf.printf "12/%d/%d%s: %f \n" day year (if part2 then " part 2" else "") realResult;;
 
 let digits = ["one"; "two"; "three"; "four"; "five"; "six"; "seven"; "eight"; "nine"]
 
 let day1 part2 input =
   let lines = split_lines input in
   let line_value line =
-    let first_num = ref (-1) in
-    let last_num = ref (-1) in
-    let handle_num num = last_num := num; if !first_num = -1 then first_num := num in
+    let first_num = ref (-1.) in
+    let last_num = ref (-1.) in
+    let handle_num num = last_num := num; if !first_num = -1. then first_num := num in
     let proc_ch idx ch = match idx, ch with
-                              | _, '0'..'9' -> let num = int_of_string (String.make 1 ch) in
+                              | _, '0'..'9' -> let num = float_of_string (String.make 1 ch) in
                                 handle_num num
                               | _ -> if part2 then
                                 List.iteri (fun numMinusOne numAsString ->
@@ -43,7 +45,7 @@ let day1 part2 input =
                                   print_newline(); *)
                                   try
                                     if (String.sub line idx (String.length numAsString)) = numAsString then
-                                      let num = 1 + numMinusOne in
+                                      let num = 1. +. (float_of_int numMinusOne) in
                                         handle_num num
                                     with _ -> ())
                                 digits
@@ -52,20 +54,20 @@ let day1 part2 input =
                               in
     String.iteri proc_ch line;
     (* Printf.printf "%s -> %d \n" line (!first_num * 10 + !last_num); *)
-    if !first_num <> -1 then (!first_num * 10 + !last_num) else 0 in
-  sum (List.map line_value lines);;
+    if !first_num <> -1. then (!first_num *. 10. +. !last_num) else 0. in
+  sumf (List.map line_value lines);;
 
-solve 2023 1 false day1 142;;
-solve 2023 1 true day1 281;;
+solve 2023 1 false day1 142.;;
+solve 2023 1 true day1 281.;;
 
 let day2 part2 input =
   let lines = split_lines input in
   let process_line line =
     let id_idx = 5 in
     let id_end_idx = String.index line ':' in
-    let id = int_of_string (String.sub line id_idx (id_end_idx - id_idx)) in
-    let block_limit = [("red", 12); ("green", 13); ("blue", 14)] in
-    let block_min = ref [("red", 0); ("green", 0); ("blue", 0)] in
+    let id = float_of_string (String.sub line id_idx (id_end_idx - id_idx)) in
+    let block_limit = [("red", 12.); ("green", 13.); ("blue", 14.)] in
+    let block_min = ref [("red", 0.); ("green", 0.); ("blue", 0.)] in
     let sets = String.split_on_char ';' (String.sub line (2 + id_end_idx) ((String.length line) - id_end_idx - 2)) in
     let over_limit = ref false in
     (* for each set, check for an impossible amount of blocks *)
@@ -73,18 +75,18 @@ let day2 part2 input =
         let block_amounts = List.map String.trim (String.split_on_char ',' set) in
         let amounts = List.map (fun amt ->
                                     let parts = String.split_on_char ' ' amt in
-                                      (int_of_string (List.nth parts 0), List.nth parts 1)) block_amounts in
+                                      (float_of_string (List.nth parts 0), List.nth parts 1)) block_amounts in
           List.iter (fun amt -> match amt with
                         | num, color ->
                             if num > (List.assoc color block_limit) then over_limit := true;
                             if num > (List.assoc color !block_min) then block_min := (color, num) :: (List.remove_assoc color !block_min)) amounts
         ) sets;
-    if part2 then (product (List.map (fun p -> match p with _, amount -> amount) !block_min)) else if !over_limit then 0 else id
+    if part2 then (productf (List.map (fun p -> match p with _, amount -> amount) !block_min)) else if !over_limit then 0. else id
   in
-  (sum (List.map process_line lines));;
+  (sumf (List.map process_line lines));;
 
-solve 2023 2 false day2 8;;
-solve 2023 2 true day2 2286;;
+solve 2023 2 false day2 8.;;
+solve 2023 2 true day2 2286.;;
 
 let list2d input =
   let lines = split_lines input in
