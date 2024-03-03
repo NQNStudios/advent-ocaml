@@ -6,7 +6,10 @@ let read_whole_file filename =
     s
 
 let split_lines text =
-  List.filter (fun l -> l <> String.empty) (String.split_on_char '\n' text)
+  List.filter (fun l -> l <> String.empty) (String.split_on_char '\n' text);;
+
+let sub_from text idx =
+  String.sub text idx (String.length text - idx);;
 
 let sum = List.fold_left ( + ) 0
 let sumf = List.fold_left ( +. ) 0.
@@ -163,7 +166,7 @@ let day3 part2 input =
     sumf (List.map (fun gear ->
       match gear with
       | ((x, y), [num1; num2]) -> begin
-        print_int x; print_string ", "; print_int y; print_string ": "; print_string (num1 ^ " " ^ num2 ^ "\n");
+        (* print_int x; print_string ", "; print_int y; print_string ": "; print_string (num1 ^ " " ^ num2 ^ "\n"); *)
         (float_of_string num1) *. (float_of_string num2)
       end
       | ((x, y), numbers) -> 0.) !gears)
@@ -173,3 +176,28 @@ let day3 part2 input =
 
 solve 2023 3 false day3 4361.;;
 solve 2023 3 true day3 467835.;;
+
+let day4 part2 input =
+  let ticket_value line =
+    let id_end_idx = String.index line ':' in
+    let pipe_idx = String.index line '|' in
+    let line_before_pipe = String.sub line (id_end_idx + 1) (pipe_idx - id_end_idx - 1) in
+    let line_after_pipe = String.sub line (pipe_idx + 1) (String.length line - pipe_idx - 1) in
+    (* print_string line_before_pipe; print_newline(); *)
+    (* print_string line_after_pipe; print_newline(); *)
+    let rec proc_numbers_array proc text =
+      let trimmed = String.trim text in
+      if String.length trimmed = 0 then ()
+      else
+        let trimmed = (trimmed ^ "  ") in
+        let next_num = int_of_string (String.trim (String.sub trimmed 0 2)) in
+        proc next_num;
+        proc_numbers_array proc (sub_from trimmed 2) in
+    let score = ref 0.5 in
+    let winning_numbers = Array.make 100 false in
+    proc_numbers_array (fun num -> winning_numbers.(num) <- true) line_before_pipe;
+    proc_numbers_array (fun num -> if winning_numbers.(num) then score := !score *. 2.) line_after_pipe;
+    floor !score in
+  sumf (List.map ticket_value (split_lines input));;
+
+solve 2023 4 false day4 13.;;
