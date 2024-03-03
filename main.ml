@@ -178,7 +178,8 @@ solve 2023 3 false day3 4361.;;
 solve 2023 3 true day3 467835.;;
 
 let day4 part2 input =
-  let ticket_value line =
+  let proc_ticket proc_start proc_winning result line =
+    proc_start ();
     let id_end_idx = String.index line ':' in
     let pipe_idx = String.index line '|' in
     let line_before_pipe = String.sub line (id_end_idx + 1) (pipe_idx - id_end_idx - 1) in
@@ -193,11 +194,14 @@ let day4 part2 input =
         let next_num = int_of_string (String.trim (String.sub trimmed 0 2)) in
         proc next_num;
         proc_numbers_array proc (sub_from trimmed 2) in
-    let score = ref 0.5 in
     let winning_numbers = Array.make 100 false in
     proc_numbers_array (fun num -> winning_numbers.(num) <- true) line_before_pipe;
-    proc_numbers_array (fun num -> if winning_numbers.(num) then score := !score *. 2.) line_after_pipe;
-    floor !score in
-  sumf (List.map ticket_value (split_lines input));;
+    proc_numbers_array (fun num -> if winning_numbers.(num) then proc_winning ()) line_after_pipe;
+    result () in
+  if not part2 then
+    let score = ref 0.5 in
+    sumf (List.map (proc_ticket (fun () -> score := 0.5) (fun () -> score := !score *. 2.) (fun () -> floor !score)) (split_lines input))
+  else
+    0.;;
 
 solve 2023 4 false day4 13.;;
