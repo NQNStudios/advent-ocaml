@@ -142,13 +142,14 @@ let day3 part2 input =
         let has_adjacent_symbol = ref false in
         let has_adjacent_gears = ref [] in
           for x1 = x to x + (String.length num - 1) do
-            iter_adjacent (fun x -> fun y -> fun ch ->
+            iter_adjacent (fun adj_x -> fun adj_y -> fun ch ->
               match ch with
               | '0'..'9'|'.' -> ()
               | '*' ->
                 begin
                 has_adjacent_symbol := true;
-                has_adjacent_gears := (x, y) :: !has_adjacent_gears
+                if not (List.exists (( = ) (adj_x, adj_y)) !has_adjacent_gears) then
+                  has_adjacent_gears := (adj_x, adj_y) :: !has_adjacent_gears
                 end
               | _ -> has_adjacent_symbol := true) padded_grid x1 y
           done;
