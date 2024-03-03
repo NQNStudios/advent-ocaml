@@ -112,11 +112,14 @@ let iter_adjacent f grid x y =
 
 let day3 part2 input =
   let nums = ref [] in
+  let gears = ref [] in
   let current_num = ref "" in
   let current_num_x = ref (-1) in
   let current_num_y = ref (-1) in
   let grid = list2d input in
-  let total = ref 0 in
+  (* Pad each row with . so numbers can't span a line break *)
+  let padded_grid = List.map (fun l -> '.'::l @ ['.']) grid in
+  let total = ref 0. in
   iter_grid (fun x -> fun y -> fun ch ->
     match ch with
     | '0'..'9' ->
@@ -132,20 +135,40 @@ let day3 part2 input =
       if !current_num <> String.empty then
         nums := !nums @ [(!current_num, !current_num_x, !current_num_y)];
         current_num := ""
-    ) grid;
+    ) padded_grid;
   List.iter (fun num_tuple ->
     match num_tuple with
       | (num, x, y) ->
         let has_adjacent_symbol = ref false in
+        let has_adjacent_gears = ref [] in
           for x1 = x to x + (String.length num - 1) do
             iter_adjacent (fun x -> fun y -> fun ch ->
               match ch with
               | '0'..'9'|'.' -> ()
-              | _ -> has_adjacent_symbol := true) grid x1 y
+              | '*' ->
+                begin
+                has_adjacent_symbol := true;
+                has_adjacent_gears := (x, y) :: !has_adjacent_gears
+                end
+              | _ -> has_adjacent_symbol := true) padded_grid x1 y
           done;
-          if !has_adjacent_symbol then total := !total + int_of_string num
+          if !has_adjacent_symbol then total := !total +. float_of_string num;
+          List.iter (fun gear_coords ->
+            (match (List.assoc_opt gear_coords !gears) with
+                |  Some numbers -> gears := (gear_coords, num :: numbers) :: List.remove_assoc (x,y) !gears
+                |  None -> gears := (gear_coords, [num]) :: !gears)) !has_adjacent_gears
     ) !nums;
-  !total;;
+  if part2 then
+    sumf (List.map (fun gear ->
+      match gear with
+      | ((x, y), [num1; num2]) -> begin
+        print_int x; print_string ", "; print_int y; print_string ": "; print_string (num1 ^ " " ^ num2 ^ "\n");
+        (float_of_string num1) *. (float_of_string num2)
+      end
+      | ((x, y), numbers) -> 0.) !gears)
+  else
+    !total;;
 
 
-solve 2023 3 false day3 4361;;
+solve 2023 3 false day3 4361.;;
+solve 2023 3 true day3 467835.;;
